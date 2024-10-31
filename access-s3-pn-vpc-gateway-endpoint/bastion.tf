@@ -14,7 +14,7 @@ resource "aws_security_group" "bastion-SSH" {
     to_port     = 22
     cidr_blocks = ["0.0.0.0/0"]
   }
-  egress = {
+  egress {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
@@ -29,7 +29,7 @@ resource "aws_security_group" "bastion-SSH" {
   tags = local.common_tags
 }
 
-# bastion ec2 instance
+# bastion ec2 instance in the public subnet, public IP automatically assigned
 resource "aws_instance" "bastion" {
   ami                    = data.aws_ami.amazon_linux.id
   instance_type          = var.instance_type

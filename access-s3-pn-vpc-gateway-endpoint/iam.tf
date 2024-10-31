@@ -15,11 +15,6 @@ resource "aws_iam_role" "bastion_role" {
   })
 }
 
-resource "aws_iam_instance_profile" "bastion_profile" {
-  name = "bastion-profile"
-  role = aws_iam_role.bastion_role.name
-}
-
 # IAM policy for S3 access
 resource "aws_iam_policy" "s3_access_policy" {
   name        = "EC2S3AccessPolicy"
@@ -46,7 +41,14 @@ resource "aws_iam_policy" "s3_access_policy" {
 EOF
 }
 
+# Attach IAM policy with the IAM role
 resource "aws_iam_role_policy_attachment" "bastion" {
   role       = aws_iam_role.bastion_role.name
   policy_arn = aws_iam_policy.s3_access_policy.arn
+}
+
+# Create IAM instance profile to allow ec2 instance to assume the IAM role associated with the instance profile
+resource "aws_iam_instance_profile" "bastion_profile" {
+  name = "bastion-profile"
+  role = aws_iam_role.bastion_role.name
 }
