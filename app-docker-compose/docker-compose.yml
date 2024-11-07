@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  app:
+    # Build the container stored locally in the current dir
+    build: .
+    # Map port 5000 of the host to port 5000 of the container
+    ports:
+      - "5000:5000"
+    # Attach the service to the 
+    networks:
+      - network
+    # Define dependency on the db service, waiting for it to be healthy before starting
+    depends_on:
+      db:
+        condition: service_healthy
+    links:
+      - db
+  
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: mydatabase
+    ports:
+      - "5432:5432"
+    restart: always
+    volumes:
+      - postgres_data_new:/var/lib/postgres/data
+    networks:
+      - network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB} -t 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 10s
+
+volumes:
+  postgres_data_new:
+
+networks:
+  network:
